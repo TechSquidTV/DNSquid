@@ -47,6 +47,8 @@ func (p *Porkbun) fetchDomains() ([]Domain, error) {
 		log.Warnf("Unable to get domains: %s", err)
 		return nil, err
 	}
+	log.Debugf("Status: %s", response.Status)
+	log.Debugf("Fetched %d domains", len(response.Domains))
 
 	return response.Domains, nil
 }
@@ -56,6 +58,7 @@ func (p *Porkbun) GetDomains() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Debugf("Fetched %d domains", len(domains))
 
 	var domainNames []string
 	for _, domain := range domains {
@@ -70,6 +73,7 @@ func (p *Porkbun) Name() string {
 }
 
 func (p *Porkbun) LoadCredentials() error {
+	log.Debugf("Loading credentials for %s", p.Name())
 	var err error
 	p.apiKey, err = keyring.Get(p.Name(), "apikey")
 	if err != nil {

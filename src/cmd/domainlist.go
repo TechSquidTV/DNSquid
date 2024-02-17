@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/charmbracelet/log"
+	"github.com/techsquidtv/dnsquid/dnsproviders"
 )
 
 // domainlistCmd represents the domainlist command
@@ -17,7 +17,18 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("domainlist called")
+		ctx := cmd.Context().Value(dnsProviderContextKey).(*dnsproviders.DNSProviderContext)
+		fullDomainList := []string{}
+		for _, provider := range ctx.RegisteredProviders {
+			log.Debug("Listing domains for provider: %s", provider.Name())
+			domains, err := provider.GetDomains()
+			if err != nil {
+				log.Warnf("Unable to get domains for provider: %s", err)
+				return
+			}
+			fullDomainList = append(fullDomainList, domains...)
+		}
+		log.Infof("Domains: %s", fullDomainList)
 	},
 }
 

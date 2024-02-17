@@ -29,9 +29,30 @@ var rootCmd = &cobra.Command{
 		newCtx := context.WithValue(cmd.Context(), dnsProviderContextKey, ctx)
 		cmd.SetContext(newCtx)
 
+		log.Debugf("Using config file: %s", viper.ConfigFileUsed())
+		log.Debug("Currently loaded configuration:")
+		configData := viper.AllSettings()
+		for key, value := range configData {
+			log.Debugf("  %s: %s", key, value)
+		}
+		// loop failing here
 		// Register configured providers
 		for _, providerName := range viper.GetStringSlice("providers") {
+			log.Debugf("Registering provider: %s", providerName)
 			ctx.RegisterProvider(providerName)
+		}
+		log.Debugf("Registered providers: %s", ctx.ListProviders())
+
+		if len(ctx.RegisteredProviders) != 0 {
+			// Authenticate all registered providers
+			for _, provider := range ctx.RegisteredProviders {
+				log.Debugf("  Authenticating provider: %s", provider.Name())
+				err := provider.LoadCredentials()
+				if err != nil {
+					log.Fatalf("Unable to authenticate provider: %s", err)
+				}
+			}
+			log.Debug("Authenticated with all providers")
 		}
 	},
 }
@@ -79,11 +100,10 @@ func initConfig() {
 	if err != nil {
 		log.Warnf("Unable to parse config file: %s", err)
 	}
-	log.Debugf("Config: %+v", cfg)
 }
 
 func init() {
-	log.SetLevel(log.DebugLevel)// TODO: Remove this line. Used for early local testing
+	log.SetLevel(log.DebugLevel) // TODO: Remove this line. Used for early local testing
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
