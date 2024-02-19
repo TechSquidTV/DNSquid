@@ -1,6 +1,13 @@
 # DNSquid
 DNSquid is a Terminal User Interface (TUI) application designed to simplify the management of your domain names and DNS records by providing a unified command-line experience supporting multiple DNS providers. DNSquid is compatible with all major operating systems and integrated with your system's native keychain to store your credentials.
 
+## Supported DNS Providers
+- [Porkbun](https://porkbun.com/)
+- ~~[Cloudflare](https://www.cloudflare.com/)~~ _(Coming Next)_
+
+Vote for what you want next in our [discussion](https://github.com/TechSquidTV/DNSquid/discussions).
+
+
 
 ## Project Status: In Development
 ### Important:
